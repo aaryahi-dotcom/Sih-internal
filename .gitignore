@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+backend/models/*.pkl
+ml/synthetic_transactions.csv
+.env

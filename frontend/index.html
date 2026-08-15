@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RiskPulse — Prototype</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <h1>RiskPulse</h1>
+        <div class="tagline">Team Hyphen — SIH 2026</div>
+      </div>
+
+      <ul class="nav-list">
+        <li>
+          <button class="nav-link active" data-tab="overview" type="button">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="6" height="6" rx="1"/><rect x="11.5" y="2.5" width="6" height="6" rx="1"/><rect x="2.5" y="11.5" width="6" height="6" rx="1"/><rect x="11.5" y="11.5" width="6" height="6" rx="1"/></svg>
+            Overview
+          </button>
+        </li>
+        <li>
+          <button class="nav-link" data-tab="score" type="button">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M6.5 10.2l2.3 2.3 4.7-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Score &amp; Decide
+          </button>
+        </li>
+        <li>
+          <button class="nav-link" data-tab="feed" type="button">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h3.2l1.8-5 3 9 1.8-5.5H18"/></svg>
+            Live Feed
+          </button>
+        </li>
+        <li>
+          <button class="nav-link" data-tab="roadmap" type="button">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17V3"/><path d="M4 3.5h9l-2 3.5 2 3.5H4"/></svg>
+            Roadmap
+          </button>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <button class="disclaimer-link" id="disclaimer-reopen" type="button">About this prototype</button>
+        <div class="sidebar-tag">Day 1 &middot; Prototype build</div>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="main-header">
+        <div class="topbar">
+          <div>
+            <h2 class="topbar-title" id="topbar-title">Overview</h2>
+            <div class="topbar-sub" id="topbar-sub">Live pipeline status and portfolio-level signal</div>
+          </div>
+          <button class="btn autoplay-btn" id="autoplay-toggle" type="button">
+            <span class="autoplay-dot"></span>
+            <span id="autoplay-label">Start live traffic</span>
+          </button>
+        </div>
+
+        <div class="card pipeline-card">
+          <div class="pipeline" id="pipeline">
+            <div class="pipeline-stage" data-stage="ingest"><span class="stage-label">Ingest</span>FastAPI + Pydantic</div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-stage" data-stage="features"><span class="stage-label">Feature Enrichment</span>In-memory store</div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-stage" data-stage="ml"><span class="stage-label">ML Scoring</span>GradientBoosting</div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-stage" data-stage="graph"><span class="stage-label">Graph Analysis</span>Stub</div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-stage" data-stage="decision"><span class="stage-label">Decision Engine</span>Thresholds + rules</div>
+            <div class="pipeline-arrow">&rarr;</div>
+            <div class="pipeline-stage" data-stage="response"><span class="stage-label">Response</span>JSON + SHAP</div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-tile">
+            <div class="value" id="stat-tx">0</div>
+            <div class="label">Transactions scored</div>
+            <svg class="stat-sparkline" id="stat-sparkline-tx" viewBox="0 0 120 26" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="stat-tile">
+            <div class="value" id="stat-alerts">0</div>
+            <div class="label">Blocked / alerts</div>
+            <svg class="stat-sparkline" id="stat-sparkline-alerts" viewBox="0 0 120 26" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="stat-tile">
+            <div class="value" id="stat-avg">0.00</div>
+            <div class="label">Avg risk score</div>
+            <svg class="stat-sparkline" id="stat-sparkline-avg" viewBox="0 0 120 26" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-scroll">
+
+        <!-- Overview tab -->
+        <div class="tab-panel active" id="tab-overview">
+          <div class="chart-grid">
+            <div class="card chart-card chart-card-wide threshold-panel">
+              <h2>Live threshold controls</h2>
+              <div class="chart-sub">Drag to re-decide every transaction on this screen instantly &mdash; changes also apply to the next transaction scored</div>
+              <div class="threshold-grid">
+                <div class="threshold-control">
+                  <label>Approve threshold <span class="threshold-val" id="th-approve-val">0.30</span></label>
+                  <input type="range" id="th-approve" min="0" max="1" step="0.01" value="0.3" />
+                </div>
+                <div class="threshold-control">
+                  <label>Block threshold <span class="threshold-val" id="th-block-val">0.70</span></label>
+                  <input type="range" id="th-block" min="0" max="1" step="0.01" value="0.7" />
+                </div>
+                <div class="threshold-control">
+                  <label>Puppet score threshold <span class="threshold-val" id="th-puppet-val">0.70</span></label>
+                  <input type="range" id="th-puppet" min="0" max="1" step="0.01" value="0.7" />
+                </div>
+                <div class="threshold-control">
+                  <label>Puppet session amount <span class="threshold-val" id="th-amount-val">&#8377;1,00,000</span></label>
+                  <input type="range" id="th-amount" min="10000" max="500000" step="10000" value="100000" />
+                </div>
+              </div>
+              <div class="threshold-footer">
+                <button class="btn btn-secondary" id="th-reset" type="button">Reset to defaults</button>
+                <span class="chart-sub" id="th-status" style="margin:0;"></span>
+              </div>
+            </div>
+
+            <div class="card chart-card chart-card-wide chart-card-hero">
+              <h2>Risk score trend</h2>
+              <div class="chart-sub">Most recent scored transactions, oldest &rarr; newest</div>
+              <div class="linechart-wrap" id="risk-linechart"></div>
+            </div>
+
+            <div class="card chart-card">
+              <h2>Decisions breakdown</h2>
+              <div class="chart-sub">Count by outcome, this session</div>
+              <div id="decision-barchart"></div>
+            </div>
+
+            <div class="card chart-card">
+              <h2>Traffic by channel</h2>
+              <div class="chart-sub">Share of transactions per payment channel</div>
+              <div id="channel-donut"></div>
+            </div>
+
+            <div class="card chart-card">
+              <h2>Risk vs. amount</h2>
+              <div class="chart-sub">Every scored transaction &mdash; does size predict risk?</div>
+              <div class="linechart-wrap" id="risk-scatter"></div>
+              <div class="legend">
+                <span class="legend-item"><span class="legend-dot" style="background:var(--status-good)"></span>approve</span>
+                <span class="legend-item"><span class="legend-dot" style="background:var(--status-warning)"></span>step-up</span>
+                <span class="legend-item"><span class="legend-dot" style="background:var(--status-critical)"></span>block</span>
+              </div>
+            </div>
+
+            <div class="card chart-card">
+              <h2>What's driving risk</h2>
+              <div class="chart-sub">Avg. |SHAP| contribution, all transactions this session</div>
+              <div id="feature-importance-chart"></div>
+            </div>
+
+            <div class="card chart-card chart-card-wide">
+              <h2>Senders to watch</h2>
+              <div class="chart-sub">Ranked by worst outcome, then highest risk score</div>
+              <div id="top-senders-table"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score & Decide tab -->
+        <div class="tab-panel" id="tab-score">
+          <div class="grid">
+            <section class="card">
+              <h2>Score a transaction</h2>
+              <form id="score-form">
+                <label>Sender ID</label>
+                <input type="text" id="f-sender" value="user_demo" required />
+                <label>Receiver ID</label>
+                <input type="text" id="f-receiver" value="merchant_demo" required />
+                <label>Amount (₹)</label>
+                <input type="number" id="f-amount" value="1500" min="1" step="1" required />
+                <input type="range" class="amount-slider" id="f-amount-slider" min="0" max="100" step="0.5" value="50" />
+                <div class="chart-sub" id="whatif-hint" style="margin: -2px 0 0;">Drag to preview the risk score live &mdash; nothing is saved until you click Score</div>
+                <label>Channel</label>
+                <select id="f-channel">
+                  <option>UPI</option>
+                  <option>NEFT</option>
+                  <option>IMPS</option>
+                  <option>CARD</option>
+                </select>
+                <label>Timestamp</label>
+                <input type="datetime-local" id="f-timestamp" required />
+                <div style="margin-top: 14px;">
+                  <button type="submit" class="btn btn-primary">Score transaction</button>
+                </div>
+              </form>
+
+              <h2 style="margin-top: 22px;">Demo scenarios</h2>
+              <div class="scenario-buttons">
+                <button class="btn btn-scenario" data-scenario="normal_traffic">Normal traffic</button>
+                <button class="btn btn-scenario" data-scenario="digital_arrest">Digital arrest</button>
+                <button class="btn btn-scenario" data-scenario="mule_ring">Mule ring</button>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2>Result <span class="preview-badge" id="r-preview-badge" style="display:none;">live preview &mdash; not saved</span></h2>
+              <div id="result-empty" class="empty-state">Score a transaction or run a scenario to see output.</div>
+              <div id="result-body" style="display:none;">
+                <div>
+                  <span class="decision-badge" id="r-decision">approve</span>
+                  <span class="gauge-value" id="r-score" style="float:right;">0%</span>
+                </div>
+                <div class="gauge-track"><div class="gauge-fill" id="r-gauge-fill"></div></div>
+                <div class="gauge-marks"><span>0</span><span>approve &lt; 0.3</span><span>block &gt; 0.7</span><span>1</span></div>
+
+                <div id="r-flag" class="flag-note" style="display:none;"></div>
+
+                <h2 style="margin-top:18px;">SHAP contributions</h2>
+                <div class="chart-sub" id="shap-chart-sub">Drivers of the risk score</div>
+                <div id="shap-stemplot"></div>
+                <div class="legend">
+                  <span class="legend-item"><span class="legend-dot" style="background:var(--div-pos)"></span>increases risk</span>
+                  <span class="legend-item"><span class="legend-dot" style="background:var(--div-neg)"></span>decreases risk</span>
+                </div>
+
+                <h2 style="margin-top:18px;">Puppet score &amp; graph flags</h2>
+                <div style="font-size:12.5px; color:var(--text-muted);">puppet_score: <strong id="r-puppet" style="color:var(--text);">0</strong></div>
+                <div class="graph-flags" id="r-graph-flags"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Live Feed tab -->
+        <div class="tab-panel" id="tab-feed">
+          <section class="card">
+            <h2>Live transaction feed</h2>
+            <div class="feed-wrap feed-wrap-tall">
+              <table>
+                <thead>
+                  <tr><th>Time</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Channel</th><th>Score</th><th>Decision</th></tr>
+                </thead>
+                <tbody id="feed-body"></tbody>
+              </table>
+              <div id="feed-empty" class="empty-state">No transactions scored yet.</div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Roadmap tab -->
+        <div class="tab-panel" id="tab-roadmap">
+          <div class="chart-sub" style="margin-bottom: 10px;">Operational layers described in the brief that are not built yet.</div>
+          <div class="coming-soon-grid">
+            <div class="coming-soon-card"><span class="ribbon">Coming soon</span><h3>Analyst Workbench</h3><p>Confirm-fraud / override actions with SHAP waterfall and case linking (Phase 3).</p></div>
+            <div class="coming-soon-card"><span class="ribbon">Coming soon</span><h3>Threshold Control Panel</h3><p>Admin sliders for approve/block thresholds with live replay preview (Phase 3).</p></div>
+            <div class="coming-soon-card"><span class="ribbon">Coming soon</span><h3>Custom Rule Engine</h3><p>IF/AND/THEN rule builder that augments or overrides the ML score (Phase 3).</p></div>
+            <div class="coming-soon-card"><span class="ribbon">Coming soon</span><h3>Transaction Graph</h3><p>NetworkX pre-approval simulation, cycle detection, PageRank deltas (Phase 2).</p></div>
+            <div class="coming-soon-card"><span class="ribbon">Coming soon</span><h3>Fraud Contagion Heatmap</h3><p>SIR-style exposure propagation from confirmed-fraud accounts (Phase 2).</p></div>
+            <div class="coming-soon-card"><span class="ribbon">Coming soon</span><h3>Model Health Monitor</h3><p>F1/precision/recall/FPR trending, drift detection, API latency (Phase 3).</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="disclaimer-overlay">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
+      <button class="modal-close" id="disclaimer-close" type="button" aria-label="Close">&times;</button>
+      <div class="disclaimer-head">
+        <span class="disclaimer-badge">Prototype</span>
+        <span class="disclaimer-title" id="disclaimer-title">Built in a single day of development</span>
+      </div>
+      <p class="disclaimer-sub">
+        This build exists to prove the core scoring pipeline end-to-end. It is not the
+        production system described in the project brief, and nothing shown below reflects
+        production-grade accuracy. Scope expands significantly across the phases that follow.
+      </p>
+      <div class="disclaimer-grid">
+        <div class="disclaimer-col live">
+          <h4>Live in this build</h4>
+          <ul>
+            <li>Scoring API (<strong>/api/v1/score</strong>)</li>
+            <li>Trained classifier + genuine SHAP output</li>
+            <li>Puppet-signature rule, Section 5.1</li>
+            <li>Scenario simulator, live feed &amp; stats</li>
+          </ul>
+        </div>
+        <div class="disclaimer-col standin">
+          <h4>Standing in for now</h4>
+          <ul>
+            <li>Small synthetic dataset, not IEEE-CIS</li>
+            <li>scikit-learn model in place of XGBoost</li>
+            <li>In-memory store in place of Redis</li>
+            <li>No PostgreSQL or Docker Compose yet</li>
+          </ul>
+        </div>
+        <div class="disclaimer-col soon">
+          <h4>Coming soon</h4>
+          <ul>
+            <li>Transaction graph engine (Phase 2)</li>
+            <li>Analyst workbench &amp; rule engine (Phase 3)</li>
+            <li>Fraud contagion heatmap (Phase 2)</li>
+            <li>Real IEEE-CIS-trained model</li>
+          </ul>
+        </div>
+      </div>
+      <div class="disclaimer-foot">
+        RiskPulse — Team Hyphen, SIH 2026. Prototype build, day 1 of the phased plan.
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
