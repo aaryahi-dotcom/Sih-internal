@@ -1,7 +1,6 @@
 fastapi
 uvicorn[standard]
 pydantic
-xgboost
 scikit-learn
 shap
 pandas
