@@ -1,4 +1,8 @@
+import os
+
 CHANNEL_CODE = {"UPI": 0, "NEFT": 1, "IMPS": 2, "CARD": 3}
+
+_MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
 
 # Default thresholds, matching the brief's bands (Step 0.3). Mutable at
 # runtime via GET/POST /api/v1/admin/thresholds — scoring.py reads these as
@@ -16,6 +20,6 @@ BLOCK_THRESHOLD = 0.7
 PUPPET_SCORE_THRESHOLD = 0.7
 PUPPET_SESSION_AMOUNT_THRESHOLD = 100_000
 
-MODEL_PATH = "models/xgb_v1.pkl"
-EXPLAINER_PATH = "models/shap_explainer_v1.pkl"
-FEATURE_COLUMNS_PATH = "models/feature_columns.pkl"
+MODEL_PATH = os.path.join(_MODELS_DIR, "xgb_v1.pkl")
+EXPLAINER_PATH = os.path.join(_MODELS_DIR, "shap_explainer_v1.pkl")
+FEATURE_COLUMNS_PATH = os.path.join(_MODELS_DIR, "feature_columns.pkl")
